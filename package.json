@@ -8,7 +8,7 @@
   ],
   "main": "src/index.js",
   "dependencies": {
-    "@atlaskit/css-reset": "^6.0.2",
+    "@atlaskit/css-reset": "6.0.2",
     "quill": "1.3.6",
     "react": "16.13.1",
     "react-dom": "16.13.1",
