@@ -8,8 +8,8 @@ import App from "./App";
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  rootElement
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>,
+    rootElement
 );
