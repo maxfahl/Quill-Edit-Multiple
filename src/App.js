@@ -3,13 +3,28 @@ import "./App.css";
 import React, { useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import Editable from "./Editable";
+import { useLocalStorageState } from "./hooks/userLocalStorageState";
 
 const App = () => {
     const quillToolbarContainer = useRef();
     const quillContainer = useRef();
 
     const [quillInstance, setQuillInstance] = useState();
-    const [editables, setEditables] = useState([]);
+    const [editables, setEditables] = useLocalStorageState('quill-edit-multiple:editables', {
+        'editable-1': {
+            id: "editable-1",
+            content: "<p>Hello, this is a text for editable 1.</p>"
+        },
+		'editable-2': {
+            id: "editable-2",
+            content: "<p>Hello, this is a text for editable 2.</p>"
+        },
+		'editable-3': {
+            id: "editable-3",
+            content: "<p>Hello, this is a text for editable 3.</p>"
+        }
+    });
+    const editablesList = Object.keys(editables).map(key => editables[key]);
     const [activeEditable, setActiveEditable] = useState();
 
     useEffect(() => {
@@ -27,27 +42,18 @@ const App = () => {
         // quill.format("roboto", "arial");
 
         setQuillInstance(quill);
-        setEditables([
-            {
-                id: "editable-1",
-                content: "<p>Hello, this is a text for editable 1.</p>"
-            },
-            {
-                id: "editable-2",
-                content: "<p>Hello, this is a text for editable 2.</p>"
-            },
-            {
-                id: "editable-3",
-                content: "<p>Hello, this is a text for editable 3.</p>"
-            }
-        ]);
     }, []);
 
     const activateEditable = (editable) => {
         const delta = quillInstance.clipboard.convert(editable.content);
         quillInstance.setContents(delta, "silent");
-        // window.setTimeout(quillInstance.setSelection(0, quillInstance.getLength() - 1), 1000);
         setActiveEditable(editable);
+        setTimeout(() => {
+            quillInstance.setSelection(
+                { index: 0, length: quillInstance.getLength() - 1 },
+                "api"
+            );
+        });
     };
 
     return (
@@ -62,11 +68,11 @@ const App = () => {
         >
             <div
                 style={{
-                    height: '60px',
-                    display: 'flex',
-                    alignItems: 'center',
-					justifyContent: 'center',
-					borderBottom: '1px solid #ccc'
+                    height: "60px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderBottom: "1px solid #ccc"
                 }}
             >
                 <div ref={quillToolbarContainer}>
@@ -87,14 +93,15 @@ const App = () => {
                     <button className="ql-strike"></button>
                     <button className="ql-underline"></button>
                     <button className="ql-code"></button>
+                    <button className="ql-clean"></button>
                 </div>
             </div>
 
             <div
                 className="editables-container"
-                style={{ flex: "1 1 auto", display: "flex" }}
+                style={{ flex: "1 1 auto", display: "flex"  }}
             >
-                {editables.map((editable) => (
+                {editablesList.map((editable) => (
                     <Editable
                         editable={editable}
                         content={editable.content}
