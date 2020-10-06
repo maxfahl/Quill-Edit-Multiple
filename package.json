@@ -1,13 +1,15 @@
 {
-  "name": "react",
-  "version": "1.0.0",
-  "description": "React example starter project",
+  "name": "quill-edit-multiple",
+  "version": "0.0.1",
+  "description": "Demo of using multiple editable areas with the same toolbar by moving the quill edit container.",
   "keywords": [
     "react",
     "starter"
   ],
   "main": "src/index.js",
   "dependencies": {
+    "@atlaskit/css-reset": "^6.0.2",
+    "quill": "1.3.6",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-scripts": "3.4.3"
