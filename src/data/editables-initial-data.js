@@ -39,7 +39,7 @@ export default {
 			est laborum.
 			</p>
 			<p><br></p>
-			<h2>Editable 2 Sub hHader</h2>
+			<h2>Editable 2 Sub Header</h2>
 			<p><br></p>
 			<p>
 			Sed ut perspiciatis unde omnis iste natus error sit
