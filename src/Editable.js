@@ -1,23 +1,35 @@
 import React, { useEffect, useRef } from "react";
 
 const Editable = ({ editable, content, quillEditorContainer, onChangeActive, isActive }) => {
+	// The element that will displat my editable's content when the editor is not active
     const contentEl = useRef();
+    // The element that will contain the quill editor element when I'm the active Editable
     const quillEditorParent = useRef();
 
+    // Set the contents of my contentEl when it changes
     useEffect(() => {
         contentEl.current.innerHTML = content;
     }, [content]);
 
-    useEffect(() => {
+	/**
+	 * When prop isActive is true, detach the quill editor element
+	 * from the temporary container of App, moving it to my own container for it.
+	 *
+	 * Also, toggle the visibility of contentEl and quillEditorParent depending
+	 * on if I'm active or not.
+	 */
+	useEffect(() => {
         if (isActive)
 			quillEditorParent.current.appendChild(quillEditorContainer.current);
-		else
-			quillEditorParent.current.innerHTML = "";
 
 		quillEditorParent.current.style.display = isActive ? "block" : "none";
 		contentEl.current.style.display = isActive ? "none" : "block";
     }, [quillEditorParent, quillEditorContainer, isActive]);
 
+	/**
+	 * If I'm the active Editable, listen for user hitting the escape button
+	 * and deactivate me.
+	 */
     useEffect(() => {
     	if (isActive) {
     		const onKeyUp = (event) => {
@@ -31,6 +43,9 @@ const Editable = ({ editable, content, quillEditorContainer, onChangeActive, isA
 		}
 	}, [isActive]);
 
+	/**
+	 * Message App that I want to be the active editable.
+	 */
     const activate = (active) => {
         onChangeActive(editable, active);
     };

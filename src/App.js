@@ -3,31 +3,33 @@ import "./App.css";
 import React, { useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import Editable from "./Editable";
-import editablesInitialData from './data/editables-initial-data'
+import editablesInitialData from "./data/editables-initial-data";
 import { useLocalStorageState } from "./hooks/userLocalStorageState";
 
 const App = () => {
-	// The div containing the quill editor when no instance of Editable is using it.
+    // The div containing the quill editor when no instance of Editable is using it.
     const quillEditorContainerTempHolder = useRef();
     // The div that contains the quill toolbar.
     const quillToolbarContainer = useRef();
     // The quill editor
     const quillEditorContainer = useRef();
-	// The quill instance
+    // The quill instance
     const [quillInstance, setQuillInstance] = useState();
     // Create our staring data
     const [editables, setEditables] = useLocalStorageState(
         "quill-edit-multiple:editables",
-		editablesInitialData
+        editablesInitialData
     );
+    // Derive a list of editables from the editables object
     const editablesList = Object.keys(editables).map((key) => editables[key]);
+    // The currently active editable, the one we're manipulating with quill
     const [activeEditable, setActiveEditable] = useState();
 
+    /**
+     * Instansiate the quill editor, using the quillEditorContainer as
+     * the element for it. Also, use our own toolbar.
+     */
     useEffect(() => {
-		let Font = Quill.import("formats/font");
-		Font.whitelist = ["roboto", "arial"];
-		Quill.register(Font, true);
-
         const quill = new Quill(quillEditorContainer.current, {
             theme: "snow",
             modules: {
@@ -35,15 +37,19 @@ const App = () => {
             }
         });
 
-		quill.format("roboto", "arial");
-
+        // Store the quill instance for future use
         setQuillInstance(quill);
     }, []);
 
+    /**
+     * Add event listeners to quill to update the active editable
+     * when we type into the quill editor.
+     */
     useEffect(() => {
-        if (quillInstance) {
+        if (quillInstance && activeEditable) {
             const onTextChange = () => {
-                activeEditable.content = quillInstance.container.firstChild.innerHTML;
+                activeEditable.content =
+                    quillInstance.container.firstChild.innerHTML;
                 setEditables({
                     ...editables,
                     [activeEditable.id]: activeEditable
@@ -54,21 +60,34 @@ const App = () => {
         }
     }, [quillInstance, activeEditable, editables, setEditables]);
 
+    /**
+     * An editable has told us it wants to activate/deactivate itself.
+     *
+     * On activate, update the contents of the quill editor to be the
+     * contents of the activated editable, then set the current active
+     * editable to the one making the request. Also, position the carret
+     * of the quill editor to the end of the content.
+     *
+     * On deactivation, set the active editable to undefined and move
+     * the quill editor DOM element back to the temp holder element.
+     */
     const setEditableActive = (editable, activate) => {
-    	if (activate) {
-			const delta = quillInstance.clipboard.convert(editable.content);
-			quillInstance.setContents(delta, "silent");
-			setActiveEditable(editable);
-			setTimeout(() => {
-				quillInstance.setSelection(
-					{ index: 0, length: quillInstance.getLength() - 1 },
-					"api"
-				);
-			});
-		} else {
-			quillEditorContainerTempHolder.current.appendChild(quillEditorContainer.current);
-			setActiveEditable(undefined);
-		}
+        if (activate) {
+            const delta = quillInstance.clipboard.convert(editable.content);
+            quillInstance.setContents(delta, "silent");
+            setActiveEditable(editable);
+            setTimeout(() => {
+                quillInstance.setSelection(
+                    { index: 0, length: quillInstance.getLength() - 1 },
+                    "api"
+                );
+            });
+        } else {
+            quillEditorContainerTempHolder.current.appendChild(
+                quillEditorContainer.current
+            );
+            setActiveEditable(undefined);
+        }
     };
 
     return (
@@ -82,6 +101,7 @@ const App = () => {
                 overflow: "hidden"
             }}
         >
+            {/* A wrapper div for the toolbar */}
             <div
                 style={{
                     height: "60px",
@@ -91,19 +111,20 @@ const App = () => {
                     borderBottom: "1px solid #ccc"
                 }}
             >
+                {/* Define what formats we want in the toolbar */}
                 <div ref={quillToolbarContainer} className="">
-                    <span className="ql-formats">
-                        <select className="ql-font"></select>
-                        {/*<select className="ql-size"></select>*/}
-                    </span>
-					<div className="ql-formats">
-						<select className="ql-header" defaultValue={false}>
-							<option value="false"></option>
-							<option value="1"></option>
-							<option value="2"></option>
-							<option value="3"></option>
-						</select>
-					</div>
+                    {/*<span className="ql-formats">*/}
+                    {/*    <select className="ql-font"></select>*/}
+                    {/*    <select className="ql-size"></select>*/}
+                    {/*</span>*/}
+                    <div className="ql-formats">
+                        <select className="ql-header" defaultValue={false}>
+                            <option value="false"></option>
+                            <option value="1"></option>
+                            <option value="2"></option>
+                            <option value="3"></option>
+                        </select>
+                    </div>
                     <span className="ql-formats">
                         <button className="ql-bold"></button>
                         <button className="ql-italic"></button>
@@ -160,7 +181,14 @@ const App = () => {
                 ))}
             </div>
 
-            <div style={{ position: "fixed", left: "100vw", top: 0 }} ref={quillEditorContainerTempHolder}>
+            {
+            	/* An temporary container for the quill editor element
+				 that will hold the element if no Editable is activated */
+            }
+            <div
+                style={{ position: "fixed", left: "100vw", top: 0 }}
+                ref={quillEditorContainerTempHolder}
+            >
                 <div
                     ref={quillEditorContainer}
                     style={{

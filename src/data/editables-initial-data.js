@@ -1,3 +1,7 @@
+/**
+ * Initial data for the editables.
+ */
+
 export default {
 	"editable-1": {
 		id: "editable-1",

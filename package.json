@@ -1,33 +1,34 @@
 {
-  "name": "quill-edit-multiple",
-  "version": "0.0.1",
-  "description": "Demo of using multiple editable areas with the same toolbar by moving the quill edit container.",
-  "keywords": [
-    "react",
-    "starter"
-  ],
-  "main": "src/index.js",
-  "dependencies": {
-    "@atlaskit/css-reset": "6.0.2",
-    "prettier": "2.1.2",
-    "quill": "1.3.6",
-    "react": "16.13.1",
-    "react-dom": "16.13.1",
-    "react-scripts": "3.4.3"
-  },
-  "devDependencies": {
-    "typescript": "3.8.3"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+    "name": "quill-edit-multiple",
+    "version": "0.0.1",
+    "description": "A sample application showing how you can have multiple editable areas of your app with the Quill editor with only one toolbar, mobing the editor around.",
+    "license": "MIT",
+    "keywords": [
+        "react",
+        "starter"
+    ],
+    "main": "src/index.js",
+    "dependencies": {
+        "@atlaskit/css-reset": "6.0.2",
+        "prettier": "2.1.2",
+        "quill": "1.3.6",
+        "react": "16.13.1",
+        "react-dom": "16.13.1",
+        "react-scripts": "3.4.3"
+    },
+    "devDependencies": {
+        "typescript": "3.8.3"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test --env=jsdom",
+        "eject": "react-scripts eject"
+    },
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not ie <= 11",
+        "not op_mini all"
+    ]
 }
