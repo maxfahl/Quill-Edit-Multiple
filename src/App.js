@@ -30,13 +30,13 @@ const App = () => {
      * the element for it. Also, use our own toolbar.
      */
     useEffect(() => {
-		// Store the quill instance for future use
-		quillInstance.current = new Quill(quillEditorContainer.current, {
-			theme: "snow",
-			modules: {
-				toolbar: quillToolbarContainer.current
-			}
-		});
+        // Store the quill instance for future use
+        quillInstance.current = new Quill(quillEditorContainer.current, {
+            theme: "snow",
+            modules: {
+                toolbar: quillToolbarContainer.current
+            }
+        });
     }, []);
 
     /**
@@ -45,19 +45,18 @@ const App = () => {
      */
     useEffect(() => {
         if (quillInstance.current && activeEditable) {
-        	const quill = quillInstance.current;
+            const quill = quillInstance.current;
             const onTextChange = () => {
-                activeEditable.content =
-					quill.container.firstChild.innerHTML;
+                activeEditable.content = quill.container.firstChild.innerHTML;
                 setEditables({
                     ...editables,
                     [activeEditable.id]: activeEditable
                 });
             };
-			quill.on("text-change", onTextChange);
+            quill.on("text-change", onTextChange);
             return () => quill.off("text-change", onTextChange);
         }
-    }, [quillInstance.current, activeEditable, editables, setEditables]);
+    }, [quillInstance, activeEditable, editables, setEditables]);
 
     /**
      * An editable has told us it wants to activate/deactivate itself.
@@ -72,12 +71,12 @@ const App = () => {
      */
     const setEditableActive = (editable, activate) => {
         if (activate) {
-        	const quill = quillInstance.current;
+            const quill = quillInstance.current;
             const delta = quill.clipboard.convert(editable.content);
-			quill.setContents(delta, "silent");
+            quill.setContents(delta, "silent");
             setActiveEditable(editable);
             setTimeout(() => {
-				quill.setSelection(
+                quill.setSelection(
                     { index: 0, length: quill.getLength() - 1 },
                     "api"
                 );
@@ -181,10 +180,8 @@ const App = () => {
                 ))}
             </div>
 
-            {
-            	/* An temporary container for the quill editor element
-				 that will hold the element if no Editable is activated */
-            }
+            {/* An temporary container for the quill editor element
+				 that will hold the element if no Editable is activated */}
             <div
                 style={{ position: "fixed", left: "100vw", top: 0 }}
                 ref={quillEditorContainerTempHolder}
