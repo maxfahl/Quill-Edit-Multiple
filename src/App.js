@@ -14,7 +14,7 @@ const App = () => {
     // The quill editor
     const quillEditorContainer = useRef();
     // The quill instance
-    const [quillInstance, setQuillInstance] = useState();
+    const quillInstance = useRef();
     // The data for each Editable, that is also persisted in local storage
     const [editables, setEditables] = useLocalStorageState(
         "quill-edit-multiple:editables",
@@ -30,15 +30,13 @@ const App = () => {
      * the element for it. Also, use our own toolbar.
      */
     useEffect(() => {
-        const quill = new Quill(quillEditorContainer.current, {
-            theme: "snow",
-            modules: {
-                toolbar: quillToolbarContainer.current
-            }
-        });
-
-        // Store the quill instance for future use
-        setQuillInstance(quill);
+		// Store the quill instance for future use
+		quillInstance.current = new Quill(quillEditorContainer.current, {
+			theme: "snow",
+			modules: {
+				toolbar: quillToolbarContainer.current
+			}
+		});
     }, []);
 
     /**
@@ -46,19 +44,20 @@ const App = () => {
      * when we type into the quill editor.
      */
     useEffect(() => {
-        if (quillInstance && activeEditable) {
+        if (quillInstance.current && activeEditable) {
+        	const quill = quillInstance.current;
             const onTextChange = () => {
                 activeEditable.content =
-                    quillInstance.container.firstChild.innerHTML;
+					quill.container.firstChild.innerHTML;
                 setEditables({
                     ...editables,
                     [activeEditable.id]: activeEditable
                 });
             };
-            quillInstance.on("text-change", onTextChange);
-            return () => quillInstance.off("text-change", onTextChange);
+			quill.on("text-change", onTextChange);
+            return () => quill.off("text-change", onTextChange);
         }
-    }, [quillInstance, activeEditable, editables, setEditables]);
+    }, [quillInstance.current, activeEditable, editables, setEditables]);
 
     /**
      * An editable has told us it wants to activate/deactivate itself.
@@ -73,12 +72,13 @@ const App = () => {
      */
     const setEditableActive = (editable, activate) => {
         if (activate) {
-            const delta = quillInstance.clipboard.convert(editable.content);
-            quillInstance.setContents(delta, "silent");
+        	const quill = quillInstance.current;
+            const delta = quill.clipboard.convert(editable.content);
+			quill.setContents(delta, "silent");
             setActiveEditable(editable);
             setTimeout(() => {
-                quillInstance.setSelection(
-                    { index: 0, length: quillInstance.getLength() - 1 },
+				quill.setSelection(
+                    { index: 0, length: quill.getLength() - 1 },
                     "api"
                 );
             });
@@ -153,12 +153,12 @@ const App = () => {
                         <button className="ql-direction" value="rtl"></button>
                         <select className="ql-align"></select>
                     </span>
-                    {/*<span className="ql-formats">*/}
-                    {/*    <button className="ql-link"></button>*/}
-                    {/*    <button className="ql-image"></button>*/}
-                    {/*    <button className="ql-video"></button>*/}
-                    {/*    <button className="ql-formula"></button>*/}
-                    {/*</span>*/}
+                    <span className="ql-formats">
+                        <button className="ql-link"></button>
+                        <button className="ql-image"></button>
+                        <button className="ql-video"></button>
+                        <button className="ql-formula"></button>
+                    </span>
                     <span className="ql-formats">
                         <button className="ql-clean"></button>
                     </span>
