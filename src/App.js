@@ -3,30 +3,22 @@ import "./App.css";
 import React, { useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import Editable from "./Editable";
+import editablesInitialData from './data/editables-initial-data'
 import { useLocalStorageState } from "./hooks/userLocalStorageState";
 
 const App = () => {
+	// The div containing the quill editor when no instance of Editable is using it.
     const quillEditorContainerTempHolder = useRef();
+    // The div that contains the quill toolbar.
     const quillToolbarContainer = useRef();
+    // The quill editor
     const quillEditorContainer = useRef();
-
+	// The quill instance
     const [quillInstance, setQuillInstance] = useState();
+    // Create our staring data
     const [editables, setEditables] = useLocalStorageState(
         "quill-edit-multiple:editables",
-        {
-            "editable-1": {
-                id: "editable-1",
-                content: "<p>Hello, this is a text for editable 1.</p>"
-            },
-            "editable-2": {
-                id: "editable-2",
-                content: "<p>Hello, this is a text for editable 2.</p>"
-            },
-            "editable-3": {
-                id: "editable-3",
-                content: "<p>Hello, this is a text for editable 3.</p>"
-            }
-        }
+		editablesInitialData
     );
     const editablesList = Object.keys(editables).map((key) => editables[key]);
     const [activeEditable, setActiveEditable] = useState();
