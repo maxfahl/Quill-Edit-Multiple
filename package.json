@@ -1,7 +1,7 @@
 {
     "name": "quill-edit-multiple",
     "version": "0.0.1",
-    "description": "A sample application showing how you can have multiple editable areas of your app with the Quill editor with only one toolbar, mobing the editor around.",
+    "description": "A sample application showing how you can have multiple editable areas of your app using the Quill editor with only one toolbar, moving the editor around.",
     "license": "MIT",
     "keywords": [
         "react",
