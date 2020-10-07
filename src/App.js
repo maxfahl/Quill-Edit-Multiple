@@ -15,7 +15,7 @@ const App = () => {
     const quillEditorContainer = useRef();
     // The quill instance
     const [quillInstance, setQuillInstance] = useState();
-    // Create our staring data
+    // The data for each Editable, that is also persisted in local storage
     const [editables, setEditables] = useLocalStorageState(
         "quill-edit-multiple:editables",
         editablesInitialData
