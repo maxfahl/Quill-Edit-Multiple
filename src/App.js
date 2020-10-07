@@ -6,54 +6,77 @@ import Editable from "./Editable";
 import { useLocalStorageState } from "./hooks/userLocalStorageState";
 
 const App = () => {
+    const quillEditorContainerTempHolder = useRef();
     const quillToolbarContainer = useRef();
-    const quillContainer = useRef();
+    const quillEditorContainer = useRef();
 
     const [quillInstance, setQuillInstance] = useState();
-    const [editables, setEditables] = useLocalStorageState('quill-edit-multiple:editables', {
-        'editable-1': {
-            id: "editable-1",
-            content: "<p>Hello, this is a text for editable 1.</p>"
-        },
-		'editable-2': {
-            id: "editable-2",
-            content: "<p>Hello, this is a text for editable 2.</p>"
-        },
-		'editable-3': {
-            id: "editable-3",
-            content: "<p>Hello, this is a text for editable 3.</p>"
+    const [editables, setEditables] = useLocalStorageState(
+        "quill-edit-multiple:editables",
+        {
+            "editable-1": {
+                id: "editable-1",
+                content: "<p>Hello, this is a text for editable 1.</p>"
+            },
+            "editable-2": {
+                id: "editable-2",
+                content: "<p>Hello, this is a text for editable 2.</p>"
+            },
+            "editable-3": {
+                id: "editable-3",
+                content: "<p>Hello, this is a text for editable 3.</p>"
+            }
         }
-    });
-    const editablesList = Object.keys(editables).map(key => editables[key]);
+    );
+    const editablesList = Object.keys(editables).map((key) => editables[key]);
     const [activeEditable, setActiveEditable] = useState();
 
     useEffect(() => {
-        // let Font = Quill.import("formats/font");
-        // Font.whitelist = ["roboto", "arial"];
-        // Quill.register(Font, true);
+		let Font = Quill.import("formats/font");
+		Font.whitelist = ["roboto", "arial"];
+		Quill.register(Font, true);
 
-        const quill = new Quill(quillContainer.current, {
+        const quill = new Quill(quillEditorContainer.current, {
             theme: "snow",
             modules: {
                 toolbar: quillToolbarContainer.current
             }
         });
 
-        // quill.format("roboto", "arial");
+		quill.format("roboto", "arial");
 
         setQuillInstance(quill);
     }, []);
 
-    const activateEditable = (editable) => {
-        const delta = quillInstance.clipboard.convert(editable.content);
-        quillInstance.setContents(delta, "silent");
-        setActiveEditable(editable);
-        setTimeout(() => {
-            quillInstance.setSelection(
-                { index: 0, length: quillInstance.getLength() - 1 },
-                "api"
-            );
-        });
+    useEffect(() => {
+        if (quillInstance) {
+            const onTextChange = () => {
+                activeEditable.content = quillInstance.container.firstChild.innerHTML;
+                setEditables({
+                    ...editables,
+                    [activeEditable.id]: activeEditable
+                });
+            };
+            quillInstance.on("text-change", onTextChange);
+            return () => quillInstance.off("text-change", onTextChange);
+        }
+    }, [quillInstance, activeEditable, editables, setEditables]);
+
+    const setEditableActive = (editable, activate) => {
+    	if (activate) {
+			const delta = quillInstance.clipboard.convert(editable.content);
+			quillInstance.setContents(delta, "silent");
+			setActiveEditable(editable);
+			setTimeout(() => {
+				quillInstance.setSelection(
+					{ index: 0, length: quillInstance.getLength() - 1 },
+					"api"
+				);
+			});
+		} else {
+			quillEditorContainerTempHolder.current.appendChild(quillEditorContainer.current);
+			setActiveEditable(undefined);
+		}
     };
 
     return (
@@ -63,7 +86,8 @@ const App = () => {
                 position: "relative",
                 height: "100vh",
                 display: "flex",
-                flexDirection: "column"
+                flexDirection: "column",
+                overflow: "hidden"
             }}
         >
             <div
@@ -75,50 +99,78 @@ const App = () => {
                     borderBottom: "1px solid #ccc"
                 }}
             >
-                <div ref={quillToolbarContainer}>
-                    <select className="ql-size" defaultValue={"normal"}>
-                        <option value="small"></option>
-                        <option value="normal"></option>
-                        <option value="large"></option>
-                        <option value="huge"></option>
-                    </select>
-
-                    {/*<select className="ql-font" defaultValue={"roboto"}>*/}
-                    {/*    <option value="roboto"></option>*/}
-                    {/*    <option value="arial"></option>*/}
-                    {/*</select>*/}
-
-                    <button className="ql-bold"></button>
-                    <button className="ql-italic"></button>
-                    <button className="ql-strike"></button>
-                    <button className="ql-underline"></button>
-                    <button className="ql-code"></button>
-                    <button className="ql-clean"></button>
+                <div ref={quillToolbarContainer} className="">
+                    <span className="ql-formats">
+                        <select className="ql-font"></select>
+                        {/*<select className="ql-size"></select>*/}
+                    </span>
+					<div className="ql-formats">
+						<select className="ql-header" defaultValue={false}>
+							<option value="false"></option>
+							<option value="1"></option>
+							<option value="2"></option>
+							<option value="3"></option>
+						</select>
+					</div>
+                    <span className="ql-formats">
+                        <button className="ql-bold"></button>
+                        <button className="ql-italic"></button>
+                        <button className="ql-underline"></button>
+                        <button className="ql-strike"></button>
+                    </span>
+                    <span className="ql-formats">
+                        <select className="ql-color"></select>
+                        <select className="ql-background"></select>
+                    </span>
+                    <span className="ql-formats">
+                        <button className="ql-script" value="sub"></button>
+                        <button className="ql-script" value="super"></button>
+                    </span>
+                    <span className="ql-formats">
+                        <button className="ql-blockquote"></button>
+                        <button className="ql-code-block"></button>
+                    </span>
+                    <span className="ql-formats">
+                        <button className="ql-list" value="ordered"></button>
+                        <button className="ql-list" value="bullet"></button>
+                        <button className="ql-indent" value="-1"></button>
+                        <button className="ql-indent" value="+1"></button>
+                    </span>
+                    <span className="ql-formats">
+                        <button className="ql-direction" value="rtl"></button>
+                        <select className="ql-align"></select>
+                    </span>
+                    {/*<span className="ql-formats">*/}
+                    {/*    <button className="ql-link"></button>*/}
+                    {/*    <button className="ql-image"></button>*/}
+                    {/*    <button className="ql-video"></button>*/}
+                    {/*    <button className="ql-formula"></button>*/}
+                    {/*</span>*/}
+                    <span className="ql-formats">
+                        <button className="ql-clean"></button>
+                    </span>
                 </div>
             </div>
 
             <div
                 className="editables-container"
-                style={{ flex: "1 1 auto", display: "flex"  }}
+                style={{ flex: "1 1 auto", display: "flex" }}
             >
                 {editablesList.map((editable) => (
                     <Editable
                         editable={editable}
                         content={editable.content}
-                        onActivate={activateEditable}
-                        quillContainer={
-                            activeEditable === editable
-                                ? quillContainer
-                                : undefined
-                        }
+                        onChangeActive={setEditableActive}
+                        quillEditorContainer={quillEditorContainer}
+                        isActive={activeEditable === editable}
                         key={editable.id}
                     />
                 ))}
             </div>
 
-            <div style={{ position: "absolute", left: "100vw", top: 0 }}>
+            <div style={{ position: "fixed", left: "100vw", top: 0 }} ref={quillEditorContainerTempHolder}>
                 <div
-                    ref={quillContainer}
+                    ref={quillEditorContainer}
                     style={{
                         position: "absolute",
                         top: 0,

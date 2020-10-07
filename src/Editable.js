@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-const Editable = ({ editable, content, quillContainer, onActivate }) => {
+const Editable = ({ editable, content, quillEditorContainer, onChangeActive, isActive }) => {
     const contentEl = useRef();
     const quillEditorParent = useRef();
 
@@ -9,20 +9,30 @@ const Editable = ({ editable, content, quillContainer, onActivate }) => {
     }, [content]);
 
     useEffect(() => {
-        if (quillEditorParent) {
-            if (quillContainer)
-                quillEditorParent.current.appendChild(quillContainer.current);
-            else quillEditorParent.current.innerHTML = "";
+        if (isActive)
+			quillEditorParent.current.appendChild(quillEditorContainer.current);
+		else
+			quillEditorParent.current.innerHTML = "";
 
-            quillEditorParent.current.style.display = quillContainer
-                ? "block"
-                : "none";
-            contentEl.current.style.display = quillContainer ? "none" : "block";
-        }
-    }, [quillEditorParent, quillContainer]);
+		quillEditorParent.current.style.display = isActive ? "block" : "none";
+		contentEl.current.style.display = isActive ? "none" : "block";
+    }, [quillEditorParent, quillEditorContainer, isActive]);
 
-    const activateMe = () => {
-        if (!quillContainer) onActivate(editable);
+    useEffect(() => {
+    	if (isActive) {
+    		const onKeyUp = (event) => {
+    			if (event.code === 'Escape') {
+					activate(false);
+				}
+			};
+
+    		document.addEventListener('keyup', onKeyUp);
+    		return () => document.removeEventListener('keyup', onKeyUp);
+		}
+	}, [isActive]);
+
+    const activate = (active) => {
+        onChangeActive(editable, active);
     };
 
     return (
@@ -35,7 +45,7 @@ const Editable = ({ editable, content, quillContainer, onActivate }) => {
 				flexBasis: 0,
                 width: 0
             }}
-            onDoubleClick={activateMe}
+            onDoubleClick={() => activate(true)}
         >
             <div
                 style={{
