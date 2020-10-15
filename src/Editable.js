@@ -27,13 +27,6 @@ const Editable = ({ editable, content, quillEditorContainer, onChangeActive, isA
     }, [quillEditorParent, quillEditorContainer, isActive]);
 
 	/**
-	 * Message App that I want to be the active editable.
-	 */
-	const activate = (active) => {
-		onChangeActive(editable, active);
-	};
-
-	/**
 	 * If I'm the active Editable, listen for user hitting the escape button
 	 * and deactivate me.
 	 */
@@ -41,14 +34,14 @@ const Editable = ({ editable, content, quillEditorContainer, onChangeActive, isA
     	if (isActive) {
     		const onKeyUp = (event) => {
     			if (event.code === 'Escape') {
-					activate(false);
+					onChangeActive(editable, false);
 				}
 			};
 
     		document.addEventListener('keyup', onKeyUp);
     		return () => document.removeEventListener('keyup', onKeyUp);
 		}
-	}, [isActive, activate]);
+	}, [isActive, editable, onChangeActive]);
 
     return (
         <div
@@ -60,7 +53,7 @@ const Editable = ({ editable, content, quillEditorContainer, onChangeActive, isA
 				flexBasis: 0,
                 width: 0
             }}
-            onDoubleClick={() => activate(true)}
+            onDoubleClick={() => onChangeActive(editable, true)}
         >
             <div
                 style={{
